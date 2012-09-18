@@ -1,6 +1,8 @@
 require "tekeya/version"
 require "active_support"
 require "mebla/railtie" if defined?(Rails)
+require "active_record" if defined?(Rails)
+require "mongoid" if defined?(Rails)
 
 module Tekeya
   extend ActiveSupport::Autoload
