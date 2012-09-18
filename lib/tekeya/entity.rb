@@ -12,52 +12,72 @@ module Tekeya
     module ClassMethods
     end
 
+    def add_relation(from, to, type)
+      ::Tekeya.relations.add(from.send(from.class.entity_primary_key), from.class_name, to.send(to.class.entity_primary_key), to.class_name, type)
+    end
+
+    def delete_relation(from, to, type)
+      ::Tekeya.relations.delete(from.send(from.class.entity_primary_key), from.class_name, to.send(to.class.entity_primary_key), to.class_name, :tracks)
+    end
+
+    def relations_of(from, entity_type, relation_type)
+      ::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class_name, nil, entity_type, relation_type).entries
+    end
+
+    def relation_exists?(from, to, type)
+      !::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class_name, to.send(to.class.entity_primary_key), entity.class_name, :tracks).entries.empty?
+    end
+
     def track(entity)
-      ::Tekeya.relations.add(self.send(self.class.entity_primary_key), self.class_name, entity.send(entity.class.entity_primary_key), entity.class_name, :tracks)
+      add_relation(self, entity, :tracks)
     end
 
     def trackers(type = nil)
-      ::Tekeya.relations.where(self.send(self.class.entity_primary_key), self.class_name, nil, type, :tracks).entries
+      relations_of(self, :tracks, type)
     end
 
     def tracks?(entity)
-      !::Tekeya.relations.where(self.send(self.class.entity_primary_key), self.class_name, entity.send(entity.class.entity_primary_key), entity.class_name, :tracks).entries.empty?
+      relation_exists?(self, entity, :tracks)
     end
 
     def untrack(entity)
-      ::Tekeya.relations.delete(self.send(self.class.entity_primary_key), self.class_name, entity.send(entity.class.entity_primary_key), entity.class_name, :tracks)
+      delete_relation(self, entity, :tracks)
     end
 
     def block(entity)
-      ::Tekeya.relations.add(self.send(self.class.entity_primary_key), self.class_name, entity.send(entity.class.entity_primary_key), entity.class_name, :blocks)
+      add_relation(self, entity, :blocks)
     end
 
     def blocked(type = nil)
-      ::Tekeya.relations.where(self.send(self.class.entity_primary_key), self.class_name, nil, type, :blocks).entries
+      relations_of(self, :blocks, type)
     end
 
     def blocks?(entity)
-      !::Tekeya.relations.where(self.send(self.class.entity_primary_key), self.class_name, entity.send(entity.class.entity_primary_key), entity.class_name, :blocks).entries.empty?
+      relation_exists?(self, entity, :blocks)
     end
 
     def unblock(entity)
-      ::Tekeya.relations.delete(self.send(self.class.entity_primary_key), self.class_name, entity.send(entity.class.entity_primary_key), entity.class_name, :blocks)
+      delete_relation(self, entity, :blocks)
     end
 
     def join(group)
-      ::Tekeya.relations.add(self.send(self.class.entity_primary_key), self.class_name, group.send(group.class.entity_primary_key), group.class_name, :joins)
+      add_relation(self, entity, :joins)
     end
 
     def groups(type = nil)
-      ::Tekeya.relations.where(self.send(self.class.entity_primary_key), self.class_name, nil, type, :joins).entries
+      relations_of(self, :joins, type)
     end
 
     def member_of?(group)
-      !::Tekeya.relations.where(self.send(self.class.entity_primary_key), self.class_name, group.send(group.class.entity_primary_key), group.class_name, :joins).entries.empty?
+      relation_exists?(self, entity, :joins)
     end
 
     def leave(group)
-      ::Tekeya.relations.delete(self.send(self.class.entity_primary_key), self.class_name, entity.send(entity.class.entity_primary_key), entity.class_name, :joins)
+      delete_relation(self, entity, :joins)
+    end
+
+    def post(content)
+      FeedItem.create(content: content, entity_type: entity.class_name, entity_id: self.send(self.class.entity_primary_key))
     end
   end
 end
