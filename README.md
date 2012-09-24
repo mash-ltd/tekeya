@@ -1,6 +1,14 @@
 # Tekeya
 
-TODO: Write a gem description
+**Tekeya** is a social engine for Rails applications based on Redis and RebatDB.
+
+## Objective
+
+We work on social networks all the time and we almost always need to create social graphs, activity feeds and notifications that are efficient, flexible and reliable.
+
+## Name
+
+**Tekeya** is an arabic word the describes a place where people meet and converse.
 
 ## Installation
 
