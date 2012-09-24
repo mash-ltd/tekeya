@@ -1,18 +1,19 @@
 require "tekeya/version"
 require "active_support"
 require "mebla/railtie" if defined?(Rails)
-require "active_record" if defined?(Rails)
-require "mongoid" if defined?(Rails)
 
 module Tekeya
   extend ActiveSupport::Autoload
 
   # Dependencies
-  autoload :Flock, 'flockdb'
   autoload :Redis, 'redis'
+  autoload :Rebat, 'rebat'
+  autoload :Mongoid
+  autoload :ActiveRecord
   # Modules
   autoload :Configuration
   autoload :Entity
+  autoload :Group
 
   # Configure Tekeya
   #
