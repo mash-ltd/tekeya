@@ -70,9 +70,16 @@ module Tekeya
 
     def post(content)
       FeedItem.create(content: content, entity_type: entity.class_name, entity_id: self.send(self.class.entity_primary_key))
+      # Create activity in DB
+      # Create attachements
+      # Create activity in Redis
+      # Call Resque FanOut task
     end
 
     private
+    def activity_key(activity_type)
+      "#{self.class_name}:#{self.send(self.entity_primary_key)}:#{activity_type}:#{current_time_from_proper_timezone}"
+    end
 
     def add_relation(from, to, type)
       ::Tekeya.relations.add(from.send(from.class.entity_primary_key), from.class_name, to.send(to.class.entity_primary_key), to.class_name, type)

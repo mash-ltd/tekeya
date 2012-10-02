@@ -1,6 +1,6 @@
 require "tekeya/version"
+require "tekeya/railtie"
 require "active_support"
-require "mebla/railtie" if defined?(Rails)
 
 module Tekeya
   extend ActiveSupport::Autoload
@@ -8,12 +8,12 @@ module Tekeya
   # Dependencies
   autoload :Redis, 'redis'
   autoload :Rebat, 'rebat'
-  autoload :Mongoid
-  autoload :ActiveRecord
   # Modules
   autoload :Configuration
   autoload :Entity
   autoload :Group
+  autoload :Activity, 'tekeya/feed/activity'
+  autoload :Attachement, 'tekeya/feed/attachement'
 
   # Configure Tekeya
   #

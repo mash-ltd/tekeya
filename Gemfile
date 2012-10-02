@@ -11,7 +11,6 @@ end
 
 group :test do
   gem 'rspec'             , '~> 2.11.0'
-  gem 'mongoid-rspec'     , '~> 1.5.4'
   gem 'database_cleaner'  , '~> 0.8.0'
 end
 
@@ -28,5 +27,6 @@ platforms :ruby do
     gem "mongo", "~> 1.7.0"
     gem "mongoid", "~> 3.0"
     gem "bson_ext", "~> 1.7.0"
+    gem 'mongoid-rspec'     , '~> 1.5.4'
   end
 end

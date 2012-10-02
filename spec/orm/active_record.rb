@@ -1,5 +1,3 @@
-tekeya = TekeyaHelper.new
-
 ActiveRecord::Migration.verbose = false
 ActiveRecord::Base.logger = Logger.new(nil)
 

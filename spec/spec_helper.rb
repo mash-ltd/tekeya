@@ -10,19 +10,17 @@ require 'bundler'
 
 Bundler.require :default, :development, :test
 
+require 'database_cleaner'
 require "#{File.dirname(__FILE__)}/tekeya_helper"
 require "#{File.dirname(__FILE__)}/../lib/tekeya"
-
+require "#{File.dirname(__FILE__)}/rails_app/config/environment"
+require "#{File.dirname(__FILE__)}/orm/#{TEKEYA_ORM}"
+  
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |config|
-  require 'database_cleaner'
-  
-  require "#{File.dirname(__FILE__)}/rails_app/config/environment"
-  require "#{File.dirname(__FILE__)}/orm/#{TEKEYA_ORM}"
-  
   config.before(:all) do
    %w(tmp tmp/config tmp/log).each do |path|
       FileUtils.mkdir_p "#{Dir.pwd}/#{path}"

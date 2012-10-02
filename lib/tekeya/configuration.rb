@@ -7,7 +7,7 @@ module Tekeya
     include Singleton
     
     attr_reader :redis, :rebat
-    attr_accessor :redis_host, :redis_port, :rebatdb_host, :rebatdb_port
+    attr_accessor :redis_host, :redis_port, :rebatdb_host, :rebatdb_port, :feed_storage_orm
     
     # @private
     # Initializes a new configuration object
@@ -15,10 +15,11 @@ module Tekeya
       parse_config      
       
       # Setup defaults
-      @redis_host   ||= "localhost"
-      @redis_port   ||= "6379"
-      @rebatdb_host ||= "localhost"
-      @rebatdb_port ||= "2011"
+      @redis_host       ||= "localhost"
+      @redis_port       ||= "6379"
+      @rebatdb_host     ||= "localhost"
+      @rebatdb_port     ||= "2011"
+      @feed_storage_orm ||= :active_record
 
       setup_databases
     end

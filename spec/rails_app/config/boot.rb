@@ -1,5 +1,5 @@
-unless defined?(DEVISE_ORM)
-  DEVISE_ORM = (ENV["DEVISE_ORM"] || :active_record).to_sym
+unless defined?(TEKEYA_ORM)
+  TEKEYA_ORM = (ENV["TEKEYA_ORM"] || :active_record).to_sym
 end
 
 require 'rubygems'
