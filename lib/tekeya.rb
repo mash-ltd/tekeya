@@ -8,12 +8,24 @@ module Tekeya
   # Dependencies
   autoload :Redis, 'redis'
   autoload :Rebat, 'rebat'
+  autoload :Resque, 'resque'
   # Modules
   autoload :Configuration
   autoload :Entity
   autoload :Group
-  autoload :Activity, 'tekeya/feed/activity'
-  autoload :Attachement, 'tekeya/feed/attachement'
+
+  module Feed
+    extend ActiveSupport::Autoload
+
+    autoload :Activity
+    autoload :Attachment
+
+    module Resque
+      extend ActiveSupport::Autoload
+
+      autoload :ActivityFanout
+    end
+  end
 
   # Configure Tekeya
   #
@@ -27,9 +39,14 @@ module Tekeya
   #   end
   def self.configure(&block)
     yield Tekeya::Configuration.instance
+    Tekeya::Configuration.instance.setup_databases
   end
 
   def self.relations
     return Tekeya::Configuration.instance.rebat
+  end
+
+  def self.redis
+    return Tekeya::Configuration.instance.redis
   end
 end

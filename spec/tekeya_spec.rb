@@ -13,7 +13,7 @@ describe "Tekeya" do
   describe "configuration" do
     it "should hold the correct data" do
       Tekeya::Configuration.instance.redis_host.should == "localhost"
-      Tekeya::Configuration.instance.redis_port.should == "6379"
+      Tekeya::Configuration.instance.redis_port.should == "9736"
       Tekeya::Configuration.instance.rebatdb_host.should == "localhost"
       Tekeya::Configuration.instance.rebatdb_port.should == "2011"
     end

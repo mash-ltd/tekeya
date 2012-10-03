@@ -21,17 +21,41 @@ require "#{File.dirname(__FILE__)}/orm/#{TEKEYA_ORM}"
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |config|
+  config.before(:each) do
+    DatabaseCleaner.clean
+  end
+  
   config.before(:all) do
-   %w(tmp tmp/config tmp/log).each do |path|
+   %w(tmp tmp/pids tmp/cache).each do |path|
       FileUtils.mkdir_p "#{Dir.pwd}/#{path}"
     end
   end
-  
-  config.after(:all) do
-    FileUtils.rm_r "#{Dir.pwd}/tmp" rescue nil
+
+  REDIS_PID = File.join(File.dirname(__FILE__), '..', 'tmp','pids','redis-test.pid')
+  REDIS_CACHE_PATH = File.join(File.dirname(__FILE__), '..', 'tmp','cache')
+
+  config.before(:suite) do
+    redis_options = {
+      "daemonize"     => 'yes',
+      "pidfile"       => REDIS_PID,
+      "port"          => 9736,
+      "timeout"       => 300,
+      "save 900"      => 1,
+      "save 300"      => 1,
+      "save 60"       => 10000,
+      "dbfilename"    => "dump.rdb",
+      "dir"           => REDIS_CACHE_PATH,
+      "loglevel"      => "debug",
+      "logfile"       => "stdout",
+      "databases"     => 16
+    }.map { |k, v| "#{k} #{v}" }.join('\n')
+    `echo '#{redis_options}' | redis-server -`
   end
 
-  config.before(:each) do
-    DatabaseCleaner.clean
+  config.after(:suite) do
+    %x{
+      cat #{REDIS_PID} | xargs kill -QUIT
+      rm -f #{REDIS_CACHE_PATH}dump.rdb
+    }
   end
 end

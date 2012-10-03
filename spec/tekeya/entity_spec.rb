@@ -17,7 +17,6 @@ describe "Tekeya" do
       User.method_defined?(:groups).should == true
       User.method_defined?(:"member_of?").should == true
       User.method_defined?(:leave).should == true
-      User.method_defined?(:post).should == true
       # Private methods
       User.private_method_defined?(:add_relation).should == true
       User.private_method_defined?(:delete_relation).should == true

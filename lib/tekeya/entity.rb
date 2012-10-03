@@ -68,33 +68,30 @@ module Tekeya
       delete_relation(self, entity, :joins)
     end
 
-    def post(content)
-      FeedItem.create(content: content, entity_type: entity.class_name, entity_id: self.send(self.class.entity_primary_key))
-      # Create activity in DB
-      # Create attachements
-      # Create activity in Redis
-      # Call Resque FanOut task
+    def feed_key
+      "#{self.class.name}:#{self.send(self.entity_primary_key)}:feed"
     end
 
     private
-    def activity_key(activity_type)
-      "#{self.class_name}:#{self.send(self.entity_primary_key)}:#{activity_type}:#{current_time_from_proper_timezone}"
-    end
 
     def add_relation(from, to, type)
-      ::Tekeya.relations.add(from.send(from.class.entity_primary_key), from.class_name, to.send(to.class.entity_primary_key), to.class_name, type)
+      ::Tekeya.relations.add(from.send(from.class.entity_primary_key), from.class.name, to.send(to.class.entity_primary_key), to.class.name, type)
     end
 
     def delete_relation(from, to, type)
-      ::Tekeya.relations.delete(from.send(from.class.entity_primary_key), from.class_name, to.send(to.class.entity_primary_key), to.class_name, :tracks)
+      ::Tekeya.relations.delete(from.send(from.class.entity_primary_key), from.class.name, to.send(to.class.entity_primary_key), to.class.name, :tracks)
     end
 
-    def relations_of(from, entity_type, relation_type)
-      ::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class_name, nil, entity_type, relation_type).entries
+    def relations_of(from, relation_type, entity_type)
+      result_entity_class = entity_type.constantize if entity_type
+      ::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class.name, nil, entity_type, relation_type).entries.map do |entry|
+        result_entity_class ||= entry.toEntityType.constantize
+        result_entity_class.where(result_entity_class.entity_primary_key.to_sym => entry.toEntityId).first
+      end
     end
 
     def relation_exists?(from, to, type)
-      !::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class_name, to.send(to.class.entity_primary_key), entity.class_name, :tracks).entries.empty?
+      !::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class.name, to.send(to.class.entity_primary_key), entity.class.name, :tracks).entries.empty?
     end
   end
 end

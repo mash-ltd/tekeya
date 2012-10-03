@@ -26,10 +26,13 @@ module Tekeya
 
     def setup_databases
       # Setup redis
-      @redis ||= Redis.new host: @redis_host, port: @redis_port.to_i
+      @redis = Redis.new host: @redis_host, port: @redis_port.to_i
+
+      # Setup resque
+      Resque.redis = @redis
 
       # Setup rebatdb
-      @rebat ||= Rebat.new "#{@rebatdb_host}", "#{@rebatdb_port}", { tracks: 1, joins: 2, blocks: 3 }
+      @rebat = Rebat.new "#{@rebatdb_host}", "#{@rebatdb_port}", { tracks: 1, joins: 2, blocks: 3 }
     end
     
     private    

@@ -1,6 +1,6 @@
 module Tekeya
   module Feed
-    module Attachement
+    module Attachment
       extend ActiveSupport::Concern
 
       included do

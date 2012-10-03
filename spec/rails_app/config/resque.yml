@@ -1,0 +1,3 @@
+development: localhost:9736
+test: localhost:9736:1
+production: localhost:9736:1
