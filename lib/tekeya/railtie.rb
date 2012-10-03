@@ -10,5 +10,9 @@ module Tekeya
       config.eager_load_paths.reject!{ |p| p =~ /\/app\/(\w+)$/ && !%w(controllers helpers views workers).include?($1) }
       config.autoload_paths += [ "#{config.root}/app/#{config.tekeya_orm}" ]
     end
+
+    initializer "Configure Tekeya" do
+      ::Tekeya::Configuration.instance.setup_databases
+    end
   end
 end

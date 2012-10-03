@@ -20,8 +20,6 @@ module Tekeya
       @rebatdb_host     ||= "localhost"
       @rebatdb_port     ||= "2011"
       @feed_storage_orm ||= :active_record
-
-      setup_databases
     end
 
     def setup_databases
