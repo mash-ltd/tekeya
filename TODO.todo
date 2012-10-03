@@ -1,0 +1,3 @@
+- Trim redis feeds
+- Copy feeds when an entity tracks another
+- Delete feeds when entity untracks another
