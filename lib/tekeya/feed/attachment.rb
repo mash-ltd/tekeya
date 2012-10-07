@@ -4,7 +4,7 @@ module Tekeya
       extend ActiveSupport::Concern
 
       included do
-        belongs_to :activity, polymorphic: true
+        belongs_to :activity
       end
 
       module ClassMethods

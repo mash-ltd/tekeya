@@ -12,13 +12,19 @@ module Tekeya
   # Modules
   autoload :Configuration
   autoload :Entity
-  autoload :Group
+
+  module Entity
+    extend ActiveSupport::Autoload
+    
+    autoload :Group
+  end
 
   module Feed
     extend ActiveSupport::Autoload
 
     autoload :Activity
     autoload :Attachment
+    autoload :Resque
 
     module Resque
       extend ActiveSupport::Autoload

@@ -4,7 +4,7 @@ module Tekeya
       extend ActiveSupport::Concern
 
       included do
-        self.send :extend, ::Tekeya::Entity
+        self.send :include, ::Tekeya::Entity
       end
 
       module ClassMethods

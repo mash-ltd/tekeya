@@ -1,3 +1,5 @@
-- Trim redis feeds
-- Copy feeds when an entity tracks another
-- Delete feeds when entity untracks another
++ Trim redis feeds
++ Copy feeds when an entity tracks another
++ Delete feeds when entity untracks another
+- Create a method to handle retrieving the entity's feed (profile and own feed)
+- Write test scenarios !!!
