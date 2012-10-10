@@ -7,7 +7,8 @@ module Tekeya
 
         @queue = :activity_queue
 
-        def self.perform(tracked_feed_key, tracker_feed_key) #:nodoc:
+        # @private
+        def self.perform(tracked_feed_key, tracker_feed_key)
           # get the keys to the activities so we can increment the counters later
           activity_keys = ::Tekeya.redis.zrange(tracked_feed_key, 0, -1)
 

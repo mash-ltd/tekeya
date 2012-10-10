@@ -140,6 +140,19 @@ describe "Tekeya" do
           @user2.tracks?(@user).should_not == true
         end
       end
+
+      describe "groups" do
+        it "should track the group automatically when an entity joins" do
+          @user.join(@group)
+          @user.tracks?(@group).should == true
+        end
+
+        it "should untrack the group automatically when an entity leaves" do
+          @user.join(@group)
+          @user.leave(@group)
+          @user.tracks?(@group).should_not == true
+        end
+      end
     end
   end
 end

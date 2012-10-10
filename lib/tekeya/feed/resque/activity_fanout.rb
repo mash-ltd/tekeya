@@ -7,7 +7,8 @@ module Tekeya
 
         @queue = :activity_queue
 
-        def self.perform(entity_id, entity_type, activity_key, score, activity_content, attachments) #:nodoc:
+        # @private
+        def self.perform(entity_id, entity_type, activity_key, score, activity_content, attachments)
           # get the entity class
           entity_type = entity_type.constantize
           entity = entity_type.where(entity_type.entity_primary_key.to_sym => entity_id).first
