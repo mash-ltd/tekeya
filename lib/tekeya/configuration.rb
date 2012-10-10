@@ -12,7 +12,7 @@ module Tekeya
     # @private
     # Initializes a new configuration object
     def initialize
-      parse_config      
+      parse_config_file "#{Rails.root}/config/tekeya.yml"
       
       # Setup defaults
       @redis_host       ||= "localhost"
@@ -31,14 +31,11 @@ module Tekeya
 
       # Setup rebatdb
       @rebat = Rebat.new "#{@rebatdb_host}", "#{@rebatdb_port}", { tracks: 1, joins: 2, blocks: 3 }
-    end
-    
-    private    
+    end    
 
     # Loads the configuration file
     # @return [nil]
-    def parse_config      
-      path = "#{Rails.root}/config/tekeya.yml"
+    def parse_config_file(path)
       return unless File.exists?(path)
       
       conf = YAML::load(ERB.new(IO.read(path)).result)[Rails.env]

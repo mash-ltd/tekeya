@@ -19,3 +19,4 @@ tmp
 .rvmrc
 *.log
 *.sqlite3
+spec/rails_app/log

@@ -72,7 +72,6 @@ RSpec.configure do |config|
       rm -f #{REDIS_CACHE_PATH}dump.rdb
     }
 
-    # FileUtils.rm_r "#{Dir.pwd}/tmp" rescue nil
     FileUtils.rm_r "#{File.dirname(__FILE__)}/rails_app/db/test.sqlite3" rescue nil
   end
 end
