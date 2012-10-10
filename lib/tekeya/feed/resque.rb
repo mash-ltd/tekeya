@@ -4,7 +4,7 @@ module Tekeya
       extend ActiveSupport::Concern
 
       included do
-        MAXTIMESTAMP = 10.days.ago.to_i
+        MAXTIMESTAMP = 10.days.ago.to_i unless defined?(MAXTIMESTAMP)
       end
 
       module ClassMethods

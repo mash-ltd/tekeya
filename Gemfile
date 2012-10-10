@@ -12,6 +12,9 @@ end
 group :test do
   gem 'rspec'             , '~> 2.11.0'
   gem 'database_cleaner'  , '~> 0.8.0'
+  gem 'fabrication'       , '~> 2.3.0'
+  gem 'faker'             , '~> 1.1.2'
+  gem 'simplecov'         , '~> 0.7.0'
 end
 
 platforms :jruby do

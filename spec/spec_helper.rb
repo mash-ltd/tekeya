@@ -1,3 +1,8 @@
+require 'simplecov'
+SimpleCov.start do 
+  add_filter '/spec/'
+end
+
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
@@ -21,8 +26,17 @@ require "#{File.dirname(__FILE__)}/orm/#{TEKEYA_ORM}"
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |config|
+  Fabrication.configure do |config|
+    config.fabricator_path = 'fabricators'
+    config.path_prefix = File.dirname(__FILE__)
+  end
+
   config.before(:each) do
     DatabaseCleaner.clean
+  end
+
+  config.after(:each) do
+    Tekeya.relations.truncate
   end
   
   config.before(:all) do
@@ -57,5 +71,8 @@ RSpec.configure do |config|
       cat #{REDIS_PID} | xargs kill -QUIT
       rm -f #{REDIS_CACHE_PATH}dump.rdb
     }
+
+    # FileUtils.rm_r "#{Dir.pwd}/tmp" rescue nil
+    FileUtils.rm_r "#{File.dirname(__FILE__)}/rails_app/db/test.sqlite3" rescue nil
   end
 end

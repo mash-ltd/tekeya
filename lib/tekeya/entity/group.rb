@@ -2,16 +2,20 @@ module Tekeya
   module Entity
     module Group
       extend ActiveSupport::Concern
+      include Entity
 
       included do
-        self.send :include, ::Tekeya::Entity
       end
 
       module ClassMethods
       end
 
+      def is_tekeya_group?
+        return true
+      end
+
       def members(type = nil)
-        relations_of(type, :tracks, self)
+        relations_of(self, :joins, type, true)
       end
     end
   end

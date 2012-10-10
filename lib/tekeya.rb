@@ -19,6 +19,17 @@ module Tekeya
     autoload :Group
   end
 
+  module Errors
+    extend ActiveSupport::Autoload
+    
+    autoload :TekeyaError
+    autoload :TekeyaFatal
+    autoload :TekeyaNonEntity
+    autoload :TekeyaNonGroup
+    autoload :TekeyaRelationAlreadyExists
+    autoload :TekeyaRelationNonExistent
+  end
+
   module Feed
     extend ActiveSupport::Autoload
 
@@ -30,6 +41,8 @@ module Tekeya
       extend ActiveSupport::Autoload
 
       autoload :ActivityFanout
+      autoload :FeedCopy
+      autoload :DeleteFeed
     end
   end
 
