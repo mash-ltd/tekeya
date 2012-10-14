@@ -37,6 +37,7 @@ RSpec.configure do |config|
 
   config.after(:each) do
     Tekeya.relations.truncate
+    Tekeya.redis.flushall
   end
   
   config.before(:all) do

@@ -8,18 +8,18 @@ module Tekeya
         @queue = :activity_queue
 
         # @private
-        def self.perform(entity_id, entity_type, activity_key, score, activity_content, attachments)
+        def self.perform(entity_id, entity_type, activity_key, score, activity, attachments)
           # get the entity class
-          entity_type = entity_type.constantize
+          entity_type = entity_type.safe_constantize
           entity = entity_type.where(entity_type.entity_primary_key.to_sym => entity_id).first
-          # we only need the feed keys of the entities
-          entit_trackers_feeds = entity.trackers.map(&:feed_key)
+          # we only need the feed keys of the trackers
+          entity_trackers_feeds = entity.trackers.map(&:feed_key)
           # keep track of the keys we delete in the trim operation for garbage collection
           removed_keys = []
 
           # write the activity to the aggregate set and the owner's feed
           ::Tekeya.redis.multi do
-            write_aggregate(activity_key, activity_content, attachments)
+            write_aggregate(activity_key, activity, attachments)
             write_to_feed(entity.profile_feed_key, score, activity_key)
           end
 
@@ -27,7 +27,7 @@ module Tekeya
           removed_keys += trim_feed(entity.profile_feed_key)
 
           # Fanout the activity to the owner's trackers
-          entit_trackers_feeds.each do |feed_key|
+          entity_trackers_feeds.each do |feed_key|
             # write the activity to the tracker's feed
             ::Tekeya.redis.multi do
               write_to_feed(feed_key, score, activity_key)
@@ -46,13 +46,12 @@ module Tekeya
         # Writes the activity and its' attachments to the aggregate set
         #
         # @param [String] activity_key the key of the activity to be added
-        # @param [String] activity_content the description body of the activity
+        # @param [String] activity the description body of the activity
         # @param [Array]  attachments an array of attachments associated with the activity
-        def self.write_aggregate(activity_key, activity_content, attachments)
+        def self.write_aggregate(activity_key, activity, attachments)
           # save the aggregate set
-          ::Tekeya.redis.sadd(activity_key, activity_content)
           attachments.each do |attachment|
-            ::Tekeya.redis.sadd(activity_key, attachment.to_json)
+            ::Tekeya.redis.sadd(activity_key, attachment)
           end
         end
       end

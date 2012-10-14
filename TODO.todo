@@ -2,5 +2,5 @@
 + Copy feeds when an entity tracks another
 + Delete feeds when entity untracks another
 + Write test scenarios !!!
-- Create a method to handle retrieving the entity's feed (profile and own feed)
-- Delete activity from Redis when deleted from the db
++ Create a method to handle retrieving the entity's feed (profile and own feed)
++ Delete activity from Redis when deleted from the db

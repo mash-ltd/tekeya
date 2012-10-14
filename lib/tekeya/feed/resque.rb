@@ -39,11 +39,11 @@ module Tekeya
           keys.each do |key|
             activity_counter_key = "#{key}:counter"
             # Check if the key is referenced anywhere
-            if ::Tekeya.redis.get(activity_counter_key) <= 0
+            if ::Tekeya.redis.get(activity_counter_key).to_i <= 0
               # Delete the activity and the counter
               ::Tekeya.redis.multi do
-                ::Tekeya.redis.remove(key)
-                ::Tekeya.redis.remove(activity_counter_key)
+                ::Tekeya.redis.del(key)
+                ::Tekeya.redis.del(activity_counter_key)
               end
             end
           end

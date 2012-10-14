@@ -35,6 +35,7 @@ module Tekeya
 
     autoload :Activity
     autoload :Attachment
+    autoload :FeedItem
     autoload :Resque
 
     module Resque
@@ -42,7 +43,8 @@ module Tekeya
 
       autoload :ActivityFanout
       autoload :FeedCopy
-      autoload :DeleteFeed
+      autoload :DeleteActivity
+      autoload :UntrackFeed
     end
   end
 

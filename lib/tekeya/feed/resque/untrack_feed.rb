@@ -2,7 +2,7 @@ module Tekeya
   module Feed
     module Resque
       # A resque worker to copy activities when an entity tracks another
-      class DeleteFeed
+      class UntrackFeed
         include Tekeya::Feed::Resque
 
         @queue = :activity_queue

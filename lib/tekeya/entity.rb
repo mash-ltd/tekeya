@@ -3,6 +3,8 @@ module Tekeya
   module Entity
     extend ActiveSupport::Concern
 
+    FEEDITEMSPERPAGE = 10
+
     included do
       class_attribute :entity_primary_key
 
@@ -10,7 +12,15 @@ module Tekeya
 
       self.entity_primary_key = :id
 
-      has_many :activities, as: :entity, class_name: ::Tekeya::Activity, dependent: :destroy
+      has_many :activities, as: :entity, class_name: "::Tekeya::Activity", dependent: :destroy do
+        def recent
+          unless self.included_modules.map(&:to_s).include?("Mongoid::Document")
+            where("created_at > ?", 10.days.ago).order('created_at DESC').limit(FEEDITEMSPERPAGE)
+          else
+            where(:created_at.gte => 10.days.ago).desc('created_at').limit(FEEDITEMSPERPAGE)
+          end
+        end
+      end
     end
 
     # Tracks the given entity and copies it's recent feed to the tracker feed
@@ -60,7 +70,7 @@ module Tekeya
       raise ::Tekeya::Errors::TekeyaRelationNonExistent.new("Can't untrack an untracked entity") unless self.tracks?(entity)
 
       ret = delete_relation(self, entity, :tracks)
-      ::Resque.enqueue(::Tekeya::Feed::Resque::DeleteFeed, entity.profile_feed_key, self.feed_key)
+      ::Resque.enqueue(::Tekeya::Feed::Resque::UntrackFeed, entity.profile_feed_key, self.feed_key)
       return ret
     end
 
@@ -161,12 +171,56 @@ module Tekeya
     #
     # @return [Array] the list of recent activities by this entity
     def profile_feed
+      acts = []
+      pkey = self.profile_feed_key
+      recent_activities_count = ::Tekeya.redis.zcard(pkey)
+      
+      # Check if the cache is not empty
+      if recent_activities_count > 0
+        # Retrieve the aggregate keys from redis
+        acts_keys = ::Tekeya.redis.zrange(pkey, 0, -1)
+        # Retrieve the aggregates
+        acts_keys.each do |act_key|
+          acts << ::Tekeya::Feed::FeedItem.from_redis(act_key, self)
+        end
+      else
+        # Retrieve the activities from the DB
+        db_recent_activities = self.activities.recent
+        db_recent_activities.each do |activity|
+          acts << ::Tekeya::Feed::FeedItem.from_db(activity, self)
+        end
+      end
+
+      return acts
     end
     
     # Returns the entity's feed
     #
     # @return [Array] the list of activities for the entities tracked by this entity
     def feed
+      acts = []
+      fkey = self.feed_key
+      recent_activities_count = ::Tekeya.redis.zcard(fkey)
+      
+      # Check if the cache is not empty
+      if recent_activities_count > 0
+        # Retrieve the aggregate keys from redis
+        acts_keys = ::Tekeya.redis.zrange(fkey, 0, -1)
+        # Retrieve the aggregates
+        acts_keys.each do |act_key|
+          acts << ::Tekeya::Feed::FeedItem.from_redis(act_key, self)
+        end
+      else
+        # Retrieve the activities from the DB
+        self.tracking.each do |tracker|
+          db_recent_activities = tracker.activities.recent
+          db_recent_activities.each do |activity|
+            acts << ::Tekeya::Feed::FeedItem.from_db(activity, tracker)
+          end
+        end
+      end
+
+      return acts
     end
 
     # @private
@@ -224,16 +278,16 @@ module Tekeya
     # @private
     # Retrieves rebat relations
     def relations_of(from, relation_type, entity_type, reverse = false)
-      result_entity_class = entity_type.constantize if entity_type
+      result_entity_class = entity_type.safe_constantize if entity_type
       unless reverse
         ::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class.name, nil, entity_type, relation_type).entries.map do |entry|
-          result_entity_class ||= entry.toEntityType.constantize
-          result_entity_class.where(result_entity_class.entity_primary_key.to_sym => entry.toEntityId).first
+          result_entity_class ||= entry.toEntityType.safe_constantize
+          result_entity_class.where(:"#{result_entity_class.entity_primary_key}" => entry.toEntityId).first
         end
       else
         ::Tekeya.relations.where(nil, entity_type, from.send(from.class.entity_primary_key), from.class.name, relation_type).entries.map do |entry|
-          result_entity_class ||= entry.fromEntityType.constantize
-          result_entity_class.where(result_entity_class.entity_primary_key.to_sym => entry.fromEntityId).first
+          result_entity_class ||= entry.fromEntityType.safe_constantize
+          result_entity_class.where(:"#{result_entity_class.entity_primary_key}" => entry.fromEntityId).first
         end
       end
     end

@@ -22,20 +22,19 @@ describe "Tekeya" do
     describe "YML configuration" do
       before :all do
         conf_file = "#{File.dirname(__FILE__)}/../tmp/tekeya_config.yml"
-        unless File.exists?(conf_file)
-          f = File.new(conf_file, 'w')
-          doc = %Q{
-            test:
-              redis_host: 'localhost'
-              redis_port: '9736'
-              rebatdb_host: 'localhost'
-              rebatdb_port: '2011'
-              feed_storage_orm: #{TEKEYA_ORM}
-          }
 
-          f.puts(doc)
-          f.close
-        end
+        f = File.new(conf_file, 'w')
+        doc = %Q{
+          test:
+            redis_host: 'localhost'
+            redis_port: '9736'
+            rebatdb_host: 'localhost'
+            rebatdb_port: '2011'
+            feed_storage_orm: #{TEKEYA_ORM}
+        }
+
+        f.puts(doc)
+        f.close
 
         Tekeya::Configuration.instance.parse_config_file(conf_file)
       end
