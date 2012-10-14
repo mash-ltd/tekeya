@@ -34,6 +34,7 @@ module Tekeya
     extend ActiveSupport::Autoload
 
     autoload :Activity
+    autoload :Attachable
     autoload :Attachment
     autoload :FeedItem
     autoload :Resque

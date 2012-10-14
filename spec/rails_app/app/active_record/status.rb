@@ -1,3 +1,3 @@
 class Status < ActiveRecord::Base
-  has_many :attachments, as: :attachable, class_name: "Tekeya::Attachment"
+  include Tekeya::Feed::Attachable
 end
