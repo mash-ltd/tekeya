@@ -53,20 +53,6 @@ module Tekeya
         autoload :UntrackFeed
       end
     end
-
-    module Notification
-      extend ActiveSupport::Autoload
-
-      autoload :Resque
-
-      module Resque
-        extend ActiveSupport::Autoload
-
-        autoload :NotificationsFanout
-        autoload :CacheNotification
-        autoload :DeleteNotification
-      end
-    end
   end
 
 

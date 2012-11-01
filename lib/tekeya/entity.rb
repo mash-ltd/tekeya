@@ -44,6 +44,14 @@ module Tekeya
       end
 
       has_many :notifications, as: :entity, class_name: "::Tekeya::Notification", dependent: :destroy do
+        def unread
+          unless ::Tekeya::Configuration.instance.feed_storage_orm == :mongoid
+            where(read: false).order('created_at DESC')
+          else
+            criteria.where(read: false).desc('created_at')
+          end
+        end
+
         # Any method missing invoked on activities is considered a new activity
         def method_missing(meth, *args, &block)
           options = args.extract_options!
@@ -350,12 +358,6 @@ module Tekeya
     # Returns a unique key for the entity's profile feed in redis
     def profile_feed_key
       "#{self.class.name}:#{self.send(self.entity_primary_key)}:profile:feed"
-    end
-
-    # @private
-    # Returns a unique key for the entity's notifications feed in redis
-    def notifications_feed_key
-      "#{self.class.name}:#{self.send(self.entity_primary_key)}:notifications:feed"
     end
 
     # @private

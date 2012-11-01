@@ -19,11 +19,6 @@ describe "Tekeya" do
         @status = Fabricate(:status)
       end
 
-      it "should create a notification in redis" do
-        @user.notifications.empty?.should == false
-        @user.notifications.first.cached_in_redis?.should == true
-      end
-
       it "should notify the entity with the proper notification data" do
         tracked_notification = @user.notifications.first
 
@@ -42,6 +37,11 @@ describe "Tekeya" do
         Tekeya::Notification.notify! [@user2, @user3, @user4], :posted, @status, @user
 
         ((@user2.notifications == @user3.notifications) == (@user4.notifications == 1)).should == true
+      end
+
+      it "should return unread notifications correctly" do
+        @user.notifications.first.read!
+        @user.notifications.unread.count.should == 1
       end
     end
 

@@ -9,8 +9,6 @@ module Tekeya
         has_many      :actors, as: :attache, class_name: 'Tekeya::Attachment'
 
         before_create :group_notifications
-        after_create  :write_notification_in_redis
-        after_destroy :delete_notification_from_redis
 
         accepts_nested_attributes_for :actors, :subject
 
@@ -35,13 +33,6 @@ module Tekeya
         end
       end
 
-      # Check if this notification is cached in redis
-      #
-      # @return [Boolean] true if an aggregate of the notification exists in redis, false otherwise
-      def cached_in_redis?
-        ::Tekeya.redis.scard(notification_key) > 0
-      end
-
       # Approximates the timestamp to the nearest 15 minutes for grouping activities
       #
       # @param  [Datetime] from_time the time to approximate
@@ -57,11 +48,9 @@ module Tekeya
         end
       end
 
-      # Returns a notification key for usage in caching
-      #
-      # @return [String] the notification key
-      def notification_key
-        "notification:#{self.id}:#{self.entity_type}:#{self.entity.send(self.entity.entity_primary_key)}:#{self.notification_type}:#{self.subject_id}:#{score}"
+      # Marks the notification as read
+      def read!
+        self.update_attribute :read, true
       end
 
       # @private
@@ -72,14 +61,6 @@ module Tekeya
       end
 
       private
-
-      # @private
-      # Writes to the notification's aggregate set (a set of actors associated with the notification)
-      def write_notification_in_redis
-        nkey = notification_key
-        tscore = score
-        ::Resque.enqueue(::Tekeya::Feed::Notification::Resque::CacheNotification, self.entity_id, self.entity_type, nkey, tscore, self.actors.map{ |att| att.to_json(root: false, only: [:attachable_id, :attachable_type]) })
-      end
 
       # @private
       # Checks if the notification should be grouped and aborts the creation of a new record
@@ -95,12 +76,6 @@ module Tekeya
             return false
           end
         end
-      end
-
-      # @private
-      # Deletes the notification's aggregate set when its deleted from the DB
-      def delete_notification_from_redis
-        ::Resque.enqueue(::Tekeya::Feed::Notification::Resque::DeleteNotification, self.notification_key)
       end
 
       # @private

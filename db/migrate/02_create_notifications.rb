@@ -6,6 +6,7 @@ class CreateNotifications < ActiveRecord::Migration
       t.string    :subject_type, null: false
       t.integer   :entity_id, null: false
       t.string    :entity_type, null: false
+      t.boolean   :read, default:false
       
       t.timestamps
     end
