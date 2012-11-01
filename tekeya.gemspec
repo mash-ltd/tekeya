@@ -2,10 +2,10 @@
 require File.expand_path('../lib/tekeya/version', __FILE__)
 
 Gem::Specification.new do |gem|
-  gem.authors       = ["Omar Mekky"]
-  gem.email         = ["omar.mekky@mashsolvents.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.authors       = ["Omar Mekky", "Khaled Gomaa"]
+  gem.email         = ["omar.mekky@mashsolvents.com", "khaled.gomaa@mashsolvents.com"]
+  gem.description   = %q{a social engine for Rails applications based on Redis and RebatDB}
+  gem.summary       = %q{a social engine for Rails applications based on Redis and RebatDB.}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
