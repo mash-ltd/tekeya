@@ -36,18 +36,39 @@ module Tekeya
     autoload :Activity
     autoload :Attachable
     autoload :Attachment
-    autoload :FeedItem
-    autoload :Resque
+    autoload :Notification
 
-    module Resque
+    module Activity
       extend ActiveSupport::Autoload
 
-      autoload :ActivityFanout
-      autoload :FeedCopy
-      autoload :DeleteActivity
-      autoload :UntrackFeed
+      autoload :FeedItem
+      autoload :Resque
+
+      module Resque
+        extend ActiveSupport::Autoload
+
+        autoload :ActivityFanout
+        autoload :FeedCopy
+        autoload :DeleteActivity
+        autoload :UntrackFeed
+      end
+    end
+
+    module Notification
+      extend ActiveSupport::Autoload
+
+      autoload :Resque
+
+      module Resque
+        extend ActiveSupport::Autoload
+
+        autoload :NotificationsFanout
+        autoload :CacheNotification
+        autoload :DeleteNotification
+      end
     end
   end
+
 
   # Configure Tekeya
   #

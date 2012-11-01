@@ -4,8 +4,9 @@ module Tekeya
       extend ActiveSupport::Concern
 
       included do
-        belongs_to :activity
+        belongs_to :attache, polymorphic: true, autosave: true
         belongs_to :attachable, polymorphic: true, autosave: true
+        belongs_to :notification_attache, polymorphic: true, autosave: true
 
         include ActiveModel::Serializers::JSON
       end

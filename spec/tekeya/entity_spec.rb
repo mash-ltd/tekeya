@@ -27,10 +27,10 @@ describe "Tekeya" do
       User.method_defined?(:profile_feed_key).should == true
       User.method_defined?(:feed_key).should == true
       # Private methods
-      User.private_method_defined?(:add_relation).should == true
-      User.private_method_defined?(:delete_relation).should == true
-      User.private_method_defined?(:relations_of).should == true
-      User.private_method_defined?(:"relation_exists?").should == true
+      User.private_method_defined?(:add_tekeya_relation).should == true
+      User.private_method_defined?(:delete_tekeya_relation).should == true
+      User.private_method_defined?(:tekeya_relations_of).should == true
+      User.private_method_defined?(:"tekeya_relation_exists?").should == true
     end
 
     describe "errors" do

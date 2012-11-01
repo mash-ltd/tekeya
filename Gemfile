@@ -7,6 +7,10 @@ group :development do
   gem 'debugger'  , '~> 1.2.0'
   gem 'yard'      , '~> 0.8.2.1'
   gem 'bluecloth'
+  gem 'guard-rspec'
+  gem 'ruby_gntp'
+  gem 'guard-bundler'
+  gem 'rb-fsevent', '~> 0.9.1'
 end
 
 group :test do

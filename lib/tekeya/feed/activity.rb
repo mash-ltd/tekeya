@@ -4,8 +4,8 @@ module Tekeya
       extend ActiveSupport::Concern
 
       included do
-        belongs_to    :entity, polymorphic: true
-        has_many      :attachments, class_name: 'Tekeya::Attachment'
+        belongs_to    :entity, polymorphic: true, autosave: true
+        has_many      :attachments, as: :attache, class_name: 'Tekeya::Attachment'
 
         before_create :group_activities
         after_create  :write_activity_in_redis
@@ -14,6 +14,8 @@ module Tekeya
         accepts_nested_attributes_for :attachments
 
         validates_presence_of :attachments
+
+        attr_writer :group_with_recent
       end
 
       # Check if this activity is cached in redis
@@ -42,7 +44,14 @@ module Tekeya
       #
       # @return [String] the activity key
       def activity_key
-        "#{self.id}:#{self.entity_type}:#{self.entity.send(self.entity.entity_primary_key)}:#{self.activity_type}:#{score}"
+        "activity:#{self.id}:#{self.entity_type}:#{self.entity.send(self.entity.entity_primary_key)}:#{self.activity_type}:#{score}"
+      end
+
+      # @private
+      #
+      # returns if the activity should be grouped with similar recent activities
+      def group_with_recent
+        @group_with_recent.nil? ? true : @group_with_recent
       end
 
       private
@@ -52,27 +61,29 @@ module Tekeya
       def write_activity_in_redis
         akey = activity_key
         tscore = score
-        ::Resque.enqueue(::Tekeya::Feed::Resque::ActivityFanout, self.entity_id, self.entity_type, akey, tscore, self, self.attachments.map{ |att| att.to_json(root: false, only: [:attachable_id, :attachable_type]) })
+        ::Resque.enqueue(::Tekeya::Feed::Activity::Resque::ActivityFanout, self.entity_id, self.entity_type, akey, tscore, self.attachments.map{ |att| att.to_json(root: false, only: [:attachable_id, :attachable_type]) })
       end
 
       # @private
       # Checks if the activity should be grouped and aborts the creation of a new record
       def group_activities
-        self.created_at = current_time_from_proper_timezone
-        rel = self.class.where(created_at: self.created_at, activity_type: self.activity_type, entity_id: self.entity_id, entity_type: entity_type)
-        if rel.count > 0
-          activity = rel.first
-          activity.attachments << self.attachments
-          self.id = activity.id
-          self.reload
-          return false
+        if self.group_with_recent
+          self.created_at = current_time_from_proper_timezone
+          rel = self.class.where(created_at: self.created_at, activity_type: self.activity_type, entity_id: self.entity_id, entity_type: entity_type)
+          if rel.count > 0
+            activity = rel.first
+            activity.attachments << self.attachments
+            self.id = activity.id
+            self.reload
+            return false
+          end
         end
       end
 
       # @private
       # Deletes the activity's aggregate set when its deleted from the DB
       def delete_activity_from_redis
-        ::Resque.enqueue(::Tekeya::Feed::Resque::DeleteActivity, self.activity_key)
+        ::Resque.enqueue(::Tekeya::Feed::Activity::Resque::DeleteActivity, self.activity_key)
       end
 
       # @private

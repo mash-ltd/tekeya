@@ -4,3 +4,5 @@
 + Write test scenarios !!!
 + Create a method to handle retrieving the entity's feed (profile and own feed)
 + Delete activity from Redis when deleted from the db
+- test callbacks
+- test notifications

@@ -5,9 +5,9 @@ module Tekeya
       include Entity
 
       included do
-      end
+        belongs_to :owner, polymorphic: true
 
-      module ClassMethods
+        validates_presence_of :owner
       end
 
       def is_tekeya_group?
@@ -15,7 +15,7 @@ module Tekeya
       end
 
       def members(type = nil)
-        relations_of(self, :joins, type, true)
+        tekeya_relations_of(self, :joins, type, true)
       end
     end
   end
