@@ -16,7 +16,7 @@ module Tekeya
       has_many :activities, as: :entity, class_name: "::Tekeya::Activity", dependent: :destroy do
         # Returns activities dating up to 10 days in the past
         def recent
-          unless ::Tekeya::Configuration.instance.feed_storage_orm == :mongoid
+          unless ::Tekeya::Configuration.instance.feed_storage_orm.to_sym == :mongoid
             where("created_at > ?", 10.days.ago).order('created_at DESC')
           else
             criteria.where(:created_at.gte => 10.days.ago).desc('created_at')
@@ -45,7 +45,7 @@ module Tekeya
 
       has_many :notifications, as: :entity, class_name: "::Tekeya::Notification", dependent: :destroy do
         def unread
-          unless ::Tekeya::Configuration.instance.feed_storage_orm == :mongoid
+          unless ::Tekeya::Configuration.instance.feed_storage_orm.to_sym == :mongoid
             where(read: false).order('created_at DESC')
           else
             criteria.where(read: false).desc('created_at')

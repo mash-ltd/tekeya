@@ -5,6 +5,6 @@ module Tekeya
     include ::Tekeya::Feed::Notification
 
     field :notification_type, type: String
-    field :read, type: Boolean
+    field :read, type: Boolean, default: false
   end
 end
