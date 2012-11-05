@@ -20,6 +20,7 @@ module Tekeya
             # we only need the feed keys of the trackers
             entity_trackers_feeds = entity.trackers.map(&:feed_key)
             entity_trackers_feeds << entity.profile_feed_key
+            entity_trackers_feeds << entity.feed_key
 
             # remove the aggregate key from the trackers' feeds and prepare the activity for garbage collection
             ::Tekeya.redis.multi do

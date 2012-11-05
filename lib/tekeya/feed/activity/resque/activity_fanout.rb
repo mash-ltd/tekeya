@@ -15,6 +15,7 @@ module Tekeya
             entity = entity_type.where(entity_type.entity_primary_key.to_sym => entity_id).first
             # we only need the feed keys of the trackers
             entity_trackers_feeds = entity.trackers.map(&:feed_key)
+            entity_trackers_feeds << entity.feed_key
             # keep track of the keys we delete in the trim operation for garbage collection
             removed_keys = []
 
