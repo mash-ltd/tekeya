@@ -41,7 +41,7 @@ module Tekeya
     module Activity
       extend ActiveSupport::Autoload
 
-      autoload :FeedItem
+      autoload :Item
       autoload :Resque
 
       module Resque

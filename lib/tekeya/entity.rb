@@ -312,13 +312,13 @@ module Tekeya
         acts_keys = ::Tekeya.redis.zrange(pkey, 0, -1)
         # Retrieve the aggregates
         acts_keys.each do |act_key|
-          acts << ::Tekeya::Feed::Activity::FeedItem.from_redis(act_key, self)
+          acts << ::Tekeya::Feed::Activity::Item.from_redis(act_key, self)
         end
       else
         # Retrieve the activities from the DB
         db_recent_activities = self.activities.recent
         db_recent_activities.each do |activity|
-          acts << ::Tekeya::Feed::Activity::FeedItem.from_db(activity, self)
+          acts << ::Tekeya::Feed::Activity::Item.from_db(activity, self)
         end
       end
 
@@ -339,14 +339,14 @@ module Tekeya
         acts_keys = ::Tekeya.redis.zrange(fkey, 0, -1)
         # Retrieve the aggregates
         acts_keys.each do |act_key|
-          acts << ::Tekeya::Feed::Activity::FeedItem.from_redis(act_key, self)
+          acts << ::Tekeya::Feed::Activity::Item.from_redis(act_key, self)
         end
       else
         # Retrieve the activities from the DB
         (self.tracking + [self]).each do |tracker|
           db_recent_activities = tracker.activities.recent
           db_recent_activities.each do |activity|
-            acts << ::Tekeya::Feed::Activity::FeedItem.from_db(activity, tracker)
+            acts << ::Tekeya::Feed::Activity::Item.from_db(activity, tracker)
           end
         end
       end

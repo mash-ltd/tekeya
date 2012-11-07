@@ -1,7 +1,7 @@
 module Tekeya
   module Feed
     module Activity
-      class FeedItem
+      class Item
         attr_reader :activity_id, :activity_type, :attachments, :actor, :timestamp
 
         def initialize(activity_id, activity_type, attachments, actor, timestamp)
@@ -16,7 +16,7 @@ module Tekeya
         # 
         # @param  [String] key the aggregate key of the activity
         # @param  [Tekeya::Entity] act_actor the activty actor; when nil the actor is retrieved from the aggregate key
-        # @return [Tekeya::Feed::FeedItem] the feed item
+        # @return [Tekeya::Feed::Activity::Item] the feed item
         def self.from_redis(key, act_actor = nil)
           key_components  = key.split(':')
           
@@ -42,7 +42,7 @@ module Tekeya
         # 
         # @param  [Tekeya::Activity] activity the source activity
         # @param  [Tekeya::Entity] act_actor the activty actor; when nil the actor is retrieved from the activity
-        # @return [Tekeya::Feed::FeedItem] the feed item
+        # @return [Tekeya::Feed::Activity::Item] the feed item
         def self.from_db(activity, act_actor = nil)
           act_id            = activity.id.to_s
           act_type          = activity.activity_type.to_sym
