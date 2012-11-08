@@ -30,13 +30,17 @@ module Tekeya
       # @param  [Datetime] from_time the time to approximate
       # @return [Integer] the timestamp approximated to the nearest 15 minutes
       def score(from_time = nil)
-        if from_time.present?
-          stamp = from_time.to_i
+        if self.group_with_recent
+          if from_time.present?
+            stamp = from_time.to_i
 
-          # floors the timestamp to the nearest 15 minute
-          return (stamp.to_f / 15.minutes).floor * 15.minutes
+            # floors the timestamp to the nearest 15 minute
+            return (stamp.to_f / 15.minutes).floor * 15.minutes
+          else
+            return current_time_from_proper_timezone.to_i
+          end
         else
-          return current_time_from_proper_timezone.to_i
+          return Time.now.to_i
         end
       end
 
