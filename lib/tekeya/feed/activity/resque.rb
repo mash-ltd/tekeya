@@ -9,7 +9,6 @@ module Tekeya
         end
 
         module ClassMethods
-          private
           # Writes the activity reference to the feed with the supplied key
           #
           # @param [String]  feed_key the key of the feed where the activity will be referenced
@@ -23,6 +22,7 @@ module Tekeya
             ::Tekeya.redis.incr(activity_counter_key)
           end
 
+          private
           # Trims the feed according to the MAXTIMESTAMP set and returns the removed keys (for garbage collection)
           #
           # @param [String] feed_key a string containing the key of the feed to be trimed

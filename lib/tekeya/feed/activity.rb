@@ -61,7 +61,16 @@ module Tekeya
       def write_activity_in_redis
         akey = activity_key
         tscore = score
-        ::Resque.enqueue(::Tekeya::Feed::Activity::Resque::ActivityFanout, self.entity_id, self.entity_type, akey, tscore, self.attachments.map{ |att| att.to_json(root: false, only: [:attachable_id, :attachable_type]) })
+        attachments_json = self.attachments.map{ |att| att.to_json(root: false, only: [:attachable_id, :attachable_type]) }
+
+        # write the activity to the aggregate set and the owner's feed
+        ::Tekeya.redis.multi do
+          write_aggregate
+          ::Tekeya::Feed::Activity::Resque::ActivityFanout.write_to_feed(self.entity.profile_feed_key, tscore, akey)
+          ::Tekeya::Feed::Activity::Resque::ActivityFanout.write_to_feed(self.entity.feed_key, tscore, akey)
+        end
+
+        ::Resque.enqueue(::Tekeya::Feed::Activity::Resque::ActivityFanout, self.entity_id, self.entity_type, akey, tscore)
       end
 
       # @private
@@ -95,6 +104,17 @@ module Tekeya
 
         # floors the timestamp to the nearest 15 minute
         return Time.at((stamp.to_f / 15.minutes).floor * 15.minutes)
+      end
+
+      # Writes the activity and its' attachments to the aggregate set
+      #
+      # @param [String] activity_key the key of the activity to be added
+      # @param [Array]  attachments an array of attachments associated with the activity
+      def write_aggregate
+        # save the aggregate set
+        self.attachments.map{ |att| att.to_json(root: false, only: [:attachable_id, :attachable_type]) }.each do |attachment|
+          ::Tekeya.redis.sadd(activity_key, attachment)
+        end
       end
     end
   end
