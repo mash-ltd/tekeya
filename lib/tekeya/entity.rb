@@ -336,7 +336,7 @@ module Tekeya
       # Check if the cache is not empty
       if recent_activities_count > 0
         # Retrieve the aggregate keys from redis
-        acts_keys = ::Tekeya.redis.zrange(fkey, 0, -1)
+        acts_keys = ::Tekeya.redis.zrevrange(fkey, 0, -1)
         # Retrieve the aggregates
         acts_keys.each do |act_key|
           acts << ::Tekeya::Feed::Activity::Item.from_redis(act_key, self)
