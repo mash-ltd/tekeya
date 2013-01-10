@@ -12,6 +12,7 @@ module Tekeya
           def self.perform(untracked_feed_key, untracker_feed_key)
             # get the keys to the activities so we can decrement the counters later
             activity_keys = ::Tekeya.redis.zrange(untracked_feed_key, 0, -1)
+            return if activity_keys.empty?
 
             ::Tekeya.redis.multi do
               # delete the latest activities of the untracked entity from the tracker feed
