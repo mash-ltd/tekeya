@@ -5,9 +5,13 @@ module Tekeya
 
       included do
         belongs_to    :entity, polymorphic: true, autosave: true
+        belongs_to    :author, polymorphic: true, autosave: true
         has_many      :attachments, as: :attache, class_name: 'Tekeya::Attachment'
 
         before_create :group_activities
+        before_create do |act|
+          act.author ||= act.entity
+        end
         after_create  :write_activity_in_redis
         after_destroy :delete_activity_from_redis
 
@@ -48,7 +52,16 @@ module Tekeya
       #
       # @return [String] the activity key
       def activity_key
-        "activity:#{self.id}:#{self.entity_type}:#{self.entity.send(self.entity.entity_primary_key)}:#{self.activity_type}:#{score}"
+        k = []
+        k[0] = 'activity'
+        k[1] = self.id
+        k[2] = self.entity_type
+        k[3] = self.entity.send(self.entity.entity_primary_key)
+        k[4] = self.author_type
+        k[5] = self.author.send(self.author.entity_primary_key)
+        k[6] = self.activity_type
+        k[7] = score
+        k.join(':')
       end
 
       # @private

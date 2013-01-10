@@ -36,7 +36,7 @@ module Tekeya
               attachments << ::Tekeya::Attachment.new(attachable: attachable)
             end
 
-            create(activity_type: meth, attachments: attachments, group_with_recent: options[:group].nil? ? true : options[:group])
+            create(activity_type: meth, attachments: attachments, group_with_recent: options[:group].nil? ? true : options[:group], author: options[:author])
           else
             super
           end
@@ -312,13 +312,19 @@ module Tekeya
         acts_keys = ::Tekeya.redis.zrevrange(pkey, 0, -1)
         # Retrieve the aggregates
         acts_keys.each do |act_key|
-          acts << ::Tekeya::Feed::Activity::Item.from_redis(act_key, self)
+          # Make `from_redis` only hit the db if author != entity
+          key_components = act_key.split(':')
+          actor = if key_components[4] == self.class.to_s && key_components[5] == self.entity_primary_key
+            self
+          end
+
+          acts << ::Tekeya::Feed::Activity::Item.from_redis(act_key, actor)
         end
       else
         # Retrieve the activities from the DB
         db_recent_activities = self.activities.recent
         db_recent_activities.each do |activity|
-          acts << ::Tekeya::Feed::Activity::Item.from_db(activity, self)
+          acts << ::Tekeya::Feed::Activity::Item.from_db(activity, activity.author)
         end
       end
 
