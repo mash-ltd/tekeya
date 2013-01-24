@@ -104,7 +104,10 @@ describe "Tekeya" do
         @act1.destroy
         @act3.destroy
         @act4.destroy
-        @act5.destroy
+
+        Timecop.travel(Time.at(20.minutes)) do
+          @act5.destroy
+        end
       end
 
       it "should remove the activity from the cache when its deleted from the db" do

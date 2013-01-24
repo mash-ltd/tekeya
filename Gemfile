@@ -19,6 +19,7 @@ group :test do
   gem 'fabrication'       , '~> 2.3.0'
   gem 'faker'             , '~> 1.1.2'
   gem 'simplecov'         , '~> 0.7.0'
+  gem 'timecop'           , '~> 0.5.9.1'
 end
 
 platforms :jruby do
