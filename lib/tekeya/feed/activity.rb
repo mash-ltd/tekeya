@@ -8,18 +8,20 @@ module Tekeya
         belongs_to    :author, polymorphic: true, autosave: true
         has_many      :attachments, as: :attache, class_name: 'Tekeya::Attachment'
 
-        before_create :group_activities
         before_create do |act|
           act.author ||= act.entity
         end
+        before_create :group_activities
+
         after_create  :write_activity_in_redis
         after_destroy :delete_activity_from_redis
 
         accepts_nested_attributes_for :attachments
 
-        validates_presence_of :attachments
+        validates_presence_of :attachments, :activity_type
 
         attr_writer :group_with_recent
+        attr_accessible :attachments, :activity_type, :author, :entity, :group_with_recent
       end
 
       # Check if this activity is cached in redis
@@ -44,7 +46,14 @@ module Tekeya
             return current_time_from_proper_timezone.to_i
           end
         else
-          return Time.now.to_i
+          if from_time.present?
+            stamp = from_time.to_i
+
+            # floors the timestamp to the nearest 15 minute
+            return (stamp.to_f / 15.minutes).floor * 15.minutes
+          else
+            return Time.now.to_i
+          end
         end
       end
 
@@ -60,7 +69,7 @@ module Tekeya
         k[4] = self.author_type
         k[5] = self.author.send(self.author.entity_primary_key)
         k[6] = self.activity_type
-        k[7] = score
+        k[7] = score(self.created_at)
         k.join(':')
       end
 
@@ -95,7 +104,9 @@ module Tekeya
       def group_activities
         if self.group_with_recent
           self.created_at = current_time_from_proper_timezone
-          rel = self.class.where(created_at: self.created_at, activity_type: self.activity_type, entity_id: self.entity_id, entity_type: entity_type)
+          rel = self.class.where( created_at: self.created_at, activity_type: self.activity_type, 
+                                  entity_id: self.entity_id, entity_type: entity_type, 
+                                  author_id: self.author_id, author_type: self.author_type)
           if rel.count > 0
             activity = rel.first
             activity.attachments << self.attachments

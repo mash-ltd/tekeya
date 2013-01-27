@@ -35,7 +35,7 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 
-  config.after(:each) do
+  config.before(:each) do
     Tekeya.relations.truncate
     Tekeya.redis.flushall
   end
