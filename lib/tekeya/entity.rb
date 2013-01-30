@@ -15,11 +15,15 @@ module Tekeya
       # define the relation with the activity
       has_many :activities, as: :entity, class_name: "::Tekeya::Activity", dependent: :destroy do
         # Returns activities dating up to 10 days in the past
-        def recent(from = 10.days.ago, to = ::Time.current)
+        def recent(options = {from: 10.days.ago, to: ::Time.current})
           unless ::Tekeya::Configuration.instance.feed_storage_orm.to_sym == :mongoid
-            where("created_at > ?", from).where("created_at < ?", to).order('created_at DESC')
+            where('created_at > ?', options[:from]) if options[:from].present?
+            where('created_at > ?', options[:to]) if options[:to].present?
+            order('created_at DESC')
           else
-            criteria.where(:created_at.gte => from, :created_at.lte => to).desc('created_at')
+            c = criteria.where(:created_at.gte => options[:from]) if options[:from].present?
+            c = criteria.where(:created_at.lte => options[:to]) if options[:to].present?
+            c.desc('created_at')
           end
         end
 
@@ -301,7 +305,7 @@ module Tekeya
     # Returns the entity's recent activities
     #
     # @return [Array] the list of recent activities by this entity
-    def profile_feed(from = 10.days.ago, to = ::Time.current)
+    def profile_feed(options = {from: 10.days.ago, to: ::Time.current})
       acts = []
       pkey = self.profile_feed_key
       recent_activities_count = ::Tekeya.redis.zcard(pkey)
@@ -322,7 +326,7 @@ module Tekeya
         end
       else
         # Retrieve the activities from the DB
-        db_recent_activities = self.activities.recent(from, to)
+        db_recent_activities = self.activities.recent(options)
         db_recent_activities.each do |activity|
           acts << ::Tekeya::Feed::Activity::Item.from_db(activity, activity.author)
         end
@@ -334,7 +338,7 @@ module Tekeya
     # Returns the entity's feed
     #
     # @return [Array] the list of activities for the entities tracked by this entity
-    def feed(from = 10.days.ago, to = ::Time.current)
+    def feed(options = {from: 10.days.ago, to: ::Time.current})
       acts = []
       fkey = self.feed_key
       recent_activities_count = ::Tekeya.redis.zcard(fkey)
@@ -350,7 +354,7 @@ module Tekeya
       else
         # Retrieve the activities from the DB
         (self.tracking + [self]).each do |tracker|
-          db_recent_activities = tracker.activities.recent(from, to)
+          db_recent_activities = tracker.activities.recent(options)
           db_recent_activities.each do |activity|
             acts << ::Tekeya::Feed::Activity::Item.from_db(activity, tracker)
           end
