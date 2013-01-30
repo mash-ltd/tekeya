@@ -15,9 +15,9 @@ describe "Tekeya" do
       @act2 = @user.activities.liked Fabricate(:status)
       @act3 = @user.activities.shared Fabricate(:status)
 
-      # Created after the grouping interval
+      # Created before the grouping interval
       @act4 = @user.activities.new activity_type: :liked, attachments: [Fabricate.build(:attachment)]
-      @act4.stub(:current_time_from_proper_timezone => @act1.created_at + 20.minutes)
+      @act4.stub(:current_time_from_proper_timezone => @act1.created_at - 20.minutes)
       @act4.save!
 
       # Manually not grouped
