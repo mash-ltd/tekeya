@@ -21,9 +21,9 @@ module Tekeya
             where('created_at > ?', options[:to]) if options[:to].present?
             order('created_at DESC')
           else
-            c = criteria.where(:created_at.gte => options[:from]) if options[:from].present?
-            c = criteria.where(:created_at.lte => options[:to]) if options[:to].present?
-            c.desc('created_at')
+            criteria.where(:created_at.gte => options[:from]) if options[:from].present?
+            criteria.where(:created_at.lte => options[:to]) if options[:to].present?
+            criteria.desc('created_at')
           end
         end
 
