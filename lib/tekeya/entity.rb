@@ -416,7 +416,7 @@ module Tekeya
     # Retrieves rebat relations
     def tekeya_relations_of(from, relation_type, entity_type, reverse = false)
       result_entity_class = entity_type.safe_constantize if entity_type
-      unless reverse
+      relations = unless reverse
         ::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class.name, nil, entity_type, relation_type).entries.map do |entry|
           result_entity_class ||= entry.toEntityType.safe_constantize
           result_entity_class.where(:"#{result_entity_class.entity_primary_key}" => entry.toEntityId).first
@@ -427,6 +427,8 @@ module Tekeya
           result_entity_class.where(:"#{result_entity_class.entity_primary_key}" => entry.fromEntityId).first
         end
       end
+
+      relations.compact
     end
 
     # @private
