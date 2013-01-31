@@ -102,11 +102,14 @@ describe "Tekeya" do
       describe "retrieval" do
         before :each do
           @user3 = Fabricate(:user)
+          @company = Fabricate(:company)
+
           @user.track(@user2)
           @user.block(@user3)
           @user.join(@group)
           @user2.join(@group)
           @user3.join(@group)
+          @company.track(@user2)
         end
 
         it "should return tracked entities" do
@@ -115,6 +118,7 @@ describe "Tekeya" do
 
         it "should return trackers" do
           @user2.trackers.include?(@user).should == true
+          @user2.trackers.include?(@company).should == true
         end
 
         it "should return blocked entities" do

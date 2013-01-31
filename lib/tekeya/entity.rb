@@ -421,13 +421,13 @@ module Tekeya
       result_entity_class = entity_type.safe_constantize if entity_type
       relations = unless reverse
         ::Tekeya.relations.where(from.send(from.class.entity_primary_key), from.class.name, nil, entity_type, relation_type).entries.map do |entry|
-          result_entity_class ||= entry.toEntityType.safe_constantize
-          result_entity_class.where(:"#{result_entity_class.entity_primary_key}" => entry.toEntityId).first
+          entity_class = result_entity_class || entry.toEntityType.safe_constantize
+          entity_class.where(:"#{entity_class.entity_primary_key}" => entry.toEntityId).first
         end
       else
         ::Tekeya.relations.where(nil, entity_type, from.send(from.class.entity_primary_key), from.class.name, relation_type).entries.map do |entry|
-          result_entity_class ||= entry.fromEntityType.safe_constantize
-          result_entity_class.where(:"#{result_entity_class.entity_primary_key}" => entry.fromEntityId).first
+          entity_class = result_entity_class || entry.fromEntityType.safe_constantize
+          entity_class.where(:"#{entity_class.entity_primary_key}" => entry.fromEntityId).first
         end
       end
 
