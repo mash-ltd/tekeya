@@ -310,7 +310,7 @@ module Tekeya
       recent_activities_count = ::Tekeya.redis.zcard(pkey)
 
       # Check if the cache is not empty
-      if recent_activities_count > 0
+      if recent_activities_count > 0 && !block_given?
         # Retrieve the aggregate keys from redis
         acts_keys = ::Tekeya.redis.zrevrange(pkey, 0, -1)
         # Retrieve the aggregates
@@ -343,7 +343,7 @@ module Tekeya
       recent_activities_count = ::Tekeya.redis.zcard(fkey)
       
       # Check if the cache is not empty
-      if recent_activities_count > 0
+      if recent_activities_count > 0 && !block_given?
         # Retrieve the aggregate keys from redis
         acts_keys = ::Tekeya.redis.zrevrange(fkey, 0, -1)
         # Retrieve the aggregates
