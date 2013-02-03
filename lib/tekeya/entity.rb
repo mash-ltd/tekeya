@@ -348,7 +348,13 @@ module Tekeya
         acts_keys = ::Tekeya.redis.zrevrange(fkey, 0, -1)
         # Retrieve the aggregates
         acts_keys.each do |act_key|
-          acts << ::Tekeya::Feed::Activity::Item.from_redis(act_key, self)
+          # Make `from_redis` only hit the db if author != entity
+          key_components = act_key.split(':')
+          actor = if key_components[4] == self.class.to_s && key_components[5] == self.entity_primary_key
+            self
+          end
+
+          acts << ::Tekeya::Feed::Activity::Item.from_redis(act_key, actor)
         end
       else
         # Retrieve the activities from the DB
