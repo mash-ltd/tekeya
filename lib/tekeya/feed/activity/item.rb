@@ -2,13 +2,14 @@ module Tekeya
   module Feed
     module Activity
       class Item
-        attr_reader :activity_id, :activity_type, :attachments, :actor, :timestamp
+        attr_reader :activity_id, :activity_type, :attachments, :actor, :author, :timestamp
 
-        def initialize(activity_id, activity_type, attachments, actor, timestamp)
+        def initialize(activity_id, activity_type, attachments, actor, author, timestamp)
           @activity_id = activity_id
           @activity_type = activity_type
           @attachments = attachments
           @actor = actor
+          @author = author
           @timestamp = timestamp
         end
 
@@ -25,8 +26,15 @@ module Tekeya
           act_time        = Time.at(key_components[7].to_i)
           
           if act_actor.nil?
-            actor_class = key_components[4].safe_constantize
-            act_actor = actor_class.where(:"#{actor_class.entity_primary_key}" => key_components[5]).first
+            actor_class = key_components[2].safe_constantize
+            act_actor = actor_class.where(:"#{actor_class.entity_primary_key}" => key_components[3]).first
+          end
+
+          act_author = unless key_components[2] == key_components[4] && key_components[3] == key_components[5]
+            author_class = key_components[4].safe_constantize
+            actor_class.where(:"#{actor_class.entity_primary_key}" => key_components[5]).first
+          else
+            act_actor
           end
 
           act_attachments = ::Tekeya.redis.smembers(key).map{|act| 
@@ -35,7 +43,7 @@ module Tekeya
             att['attachable_type'].safe_constantize.find att['attachable_id']
           }
 
-          return self.new(act_id, act_type, act_attachments, act_actor, act_time)
+          return self.new(act_id, act_type, act_attachments, act_actor, act_author, act_time)
         end
 
         # Builds a feed item a DB activity
@@ -47,10 +55,11 @@ module Tekeya
           act_id            = activity.id.to_s
           act_type          = activity.activity_type.to_sym
           act_time          = activity.created_at
-          act_actor       ||= activity.author || activity.entity
+          act_actor       ||= activity.entity
+          act_author        = activity.author
           act_attachments   = activity.attachments.map(&:attachable)
 
-          return self.new(act_id, act_type, act_attachments, act_actor, act_time)
+          return self.new(act_id, act_type, act_attachments, act_actor, act_author, act_time)
         end
       end
     end
