@@ -32,7 +32,7 @@ module Tekeya
 
           act_author = unless key_components[2] == key_components[4] && key_components[3] == key_components[5]
             author_class = key_components[4].safe_constantize
-            actor_class.where(:"#{actor_class.entity_primary_key}" => key_components[5]).first
+            author_class.where(:"#{actor_class.entity_primary_key}" => key_components[5]).first
           else
             act_actor
           end
