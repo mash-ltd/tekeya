@@ -331,7 +331,7 @@ module Tekeya
         end
       end
 
-      return acts
+      return acts.sort { |a, b| b.timestamp <=> a.timestamp }
     end
     
     # Returns the entity's feed
@@ -366,7 +366,7 @@ module Tekeya
         end
       end
 
-      return acts
+      return acts.sort { |a, b| b.timestamp <=> a.timestamp }
     end
 
     # @private
