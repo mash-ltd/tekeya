@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem "rails"     , "~> 3.2.6"
+  gem "rails"     , ">= 3.2.6"
   gem 'debugger'  , '~> 1.2.0'
   gem 'yard'      , '~> 0.8.2.1'
   gem 'bluecloth'
