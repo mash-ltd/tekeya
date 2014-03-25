@@ -18,5 +18,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency  'redis', '~> 3.0.1'
   gem.add_dependency  'rebat', '~> 0.1.4'
   gem.add_dependency  'resque', '~> 1.23.0'
-  gem.add_dependency  'railties', '~> 3.1'
+  gem.add_dependency  'railties', '> 3.1'
 end
