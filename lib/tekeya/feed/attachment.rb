@@ -9,7 +9,6 @@ module Tekeya
         belongs_to :notification_attache, polymorphic: true, autosave: true
 
         include ActiveModel::Serializers::JSON
-        attr_accessible :attache, :attachable, :notification_attache
       end
 
       module ClassMethods

@@ -30,4 +30,5 @@ RailsApp::Application.configure do
 
   # Enable threaded mode
   # config.threadsafe!
+  config.eager_load = false
 end

@@ -21,7 +21,6 @@ module Tekeya
         validates_presence_of :attachments, :activity_type
 
         attr_writer :group_with_recent
-        attr_accessible :attachments, :activity_type, :author, :entity, :group_with_recent
       end
 
       # Check if this activity is cached in redis

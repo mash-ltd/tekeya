@@ -15,7 +15,6 @@ module Tekeya
         validates_presence_of :actors
 
         attr_writer :group_with_recent
-        attr_accessible :entity, :subject, :actors, :notification_type, :read, :group_with_recent
       end
 
       module ClassMethods

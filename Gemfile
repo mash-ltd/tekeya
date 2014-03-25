@@ -14,9 +14,9 @@ group :development do
 end
 
 group :test do
-  gem 'rspec'             , '~> 2.11.0'
-  gem 'database_cleaner'  , '~> 0.8.0'
-  gem 'fabrication'       , '~> 2.3.0'
+  gem 'rspec'             , '~> 2.14.0'
+  gem 'database_cleaner'  , '~> 1.2.0'
+  gem 'fabrication'       , '~> 2.9.8'
   gem 'faker'             , '~> 1.1.2'
   gem 'simplecov'         , '~> 0.7.0'
   gem 'timecop'           , '~> 0.5.9.1'
@@ -30,11 +30,12 @@ end
 
 platforms :ruby do
   gem "sqlite3"
+  gem "thin"
 
   group :mongoid do
-    gem "mongo", "~> 1.7.0"
-    gem "mongoid", "~> 3.0"
-    gem "bson_ext", "~> 1.7.0"
-    gem 'mongoid-rspec'     , '~> 1.5.4'
+    #gem "mongo", "~> 1.7.0"
+    gem "mongoid", "4.0.0.beta1", github: 'mongoid/mongoid'
+    #gem "bson_ext", "~> 1.7.0"
+    #gem 'mongoid-rspec'     , '>= 1.6.0', github: 'evansagge/mongoid-rspec'
   end
 end
